@@ -1,19 +1,37 @@
 <?php
 
-// 1. Paksa Vercel nulis cache dan desain di folder /tmp (satu-satunya yang diizinkan)
-$_SERVER['APP_CONFIG_CACHE'] = '/tmp/config.php';
-$_SERVER['APP_EVENTS_CACHE'] = '/tmp/events.php';
-$_SERVER['APP_PACKAGES_CACHE'] = '/tmp/packages.php';
-$_SERVER['APP_ROUTES_CACHE'] = '/tmp/routes.php';
-$_SERVER['APP_SERVICES_CACHE'] = '/tmp/services.php';
-$_SERVER['VIEW_COMPILED_PATH'] = '/tmp';
-$_SERVER['SESSION_DRIVER'] = 'cookie';
-$_SERVER['LOG_CHANNEL'] = 'stderr';
+// 1. Buka paksa mode Debug biar kalau eror kelihatan jelas teks aslinya!
+$_SERVER['APP_DEBUG'] = 'true';
+$_ENV['APP_DEBUG'] = 'true';
 
-// 2. Bypass Database: Mencegah web Error 500 karena nyari MySQL lokal
+// 2. Siapkan folder /tmp Vercel buat nyimpen file Blade (karena Vercel aslinya Read-Only)
+$tmpStorage = '/tmp/storage';
+$dirs = [
+    "$tmpStorage/framework/views",
+    "$tmpStorage/framework/cache",
+    "$tmpStorage/framework/sessions",
+    "$tmpStorage/logs"
+];
+
+// Otomatis bikin foldernya kalau belum ada
+foreach ($dirs as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+}
+
+// 3. Paksa Laravel pakai folder /tmp yang udah kita bikin buat nampilin views
+$_SERVER['LARAVEL_STORAGE_PATH'] = $tmpStorage;
+$_ENV['LARAVEL_STORAGE_PATH'] = $tmpStorage;
+$_SERVER['VIEW_COMPILED_PATH'] = "$tmpStorage/framework/views";
+$_ENV['VIEW_COMPILED_PATH'] = "$tmpStorage/framework/views";
+
+// 4. Bypass Database MySQL lokal ke SQLite sementara biar web bisa nampil dulu
 $_SERVER['DB_CONNECTION'] = 'sqlite';
 $_SERVER['DB_DATABASE'] = '/tmp/database.sqlite';
-file_put_contents('/tmp/database.sqlite', '');
+if (!file_exists('/tmp/database.sqlite')) {
+    file_put_contents('/tmp/database.sqlite', '');
+}
 
-// 3. Jalankan Website Laravel
+// 5. Jalankan Aplikasi Laravel
 require __DIR__ . '/../public/index.php';
