@@ -32,7 +32,7 @@ return [
     ],
     
     'python_yolo' => [
-    'url' => env('PYTHON_YOLO_URL', 'http://127.0.0.1:8001'),
+    'url' => env('PYTHON_YOLO_URL', 'https://wastedetector-b3.onrender.com'),
 ],
 
 ];

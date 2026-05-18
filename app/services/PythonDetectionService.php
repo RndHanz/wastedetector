@@ -11,7 +11,7 @@ class PythonDetectionService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.python_yolo.url', 'http://127.0.0.1:8001');
+        $this->baseUrl = config('services.python_yolo.url', 'https://wastedetector-b3.onrender.com');
     }
 
     public function detect(string $imagePath): array
